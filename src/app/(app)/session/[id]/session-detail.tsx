@@ -1,6 +1,7 @@
 "use client"
 
 import { useRouter } from "next/navigation"
+import { toast } from "sonner"
 import { trpc } from "@/trpc/client"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -53,11 +54,21 @@ export function SessionDetail({ sessionId }: { sessionId: string }) {
     { enabled: !!me }
   )
 
-  const join = trpc.sessions.join.useMutation({ onSuccess: () => refetch() })
-  const updateStatus = trpc.sessions.updateParticipantStatus.useMutation({
-    onSuccess: () => refetch(),
+  const join = trpc.sessions.join.useMutation({
+    onSuccess: () => { refetch(); toast.success("Demande envoyée !") },
+    onError: () => toast.error("Impossible de rejoindre la session"),
   })
-  const sendVibe = trpc.vibes.send.useMutation({ onSuccess: () => refetchVibes() })
+  const updateStatus = trpc.sessions.updateParticipantStatus.useMutation({
+    onSuccess: (_, vars) => {
+      refetch()
+      toast.success(vars.status === "accepted" ? "Rider accepté" : "Rider refusé")
+    },
+    onError: () => toast.error("Erreur lors de la mise à jour"),
+  })
+  const sendVibe = trpc.vibes.send.useMutation({
+    onSuccess: () => { refetchVibes(); toast.success("🤙 Vibe envoyée !") },
+    onError: () => toast.error("Erreur lors de l'envoi"),
+  })
 
   if (isLoading) {
     return <div className="h-48 rounded-lg border bg-muted animate-pulse" />

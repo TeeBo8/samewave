@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { toast } from "sonner"
 import { trpc } from "@/trpc/client"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -34,14 +35,13 @@ function ProfileForm({ profile, onSaved }: { profile: Profile | null | undefined
   const [level, setLevel] = useState<Level | null>((profile?.level as Level) ?? null)
   const [locationCity, setLocationCity] = useState(profile?.locationCity ?? "")
   const [bio, setBio] = useState(profile?.bio ?? "")
-  const [saved, setSaved] = useState(false)
 
   const upsert = trpc.profiles.upsert.useMutation({
     onSuccess: () => {
       onSaved()
-      setSaved(true)
-      setTimeout(() => setSaved(false), 2000)
+      toast.success("Profil sauvegardé")
     },
+    onError: () => toast.error("Erreur lors de la sauvegarde"),
   })
 
   function toggleDiscipline(value: string) {
@@ -125,7 +125,7 @@ function ProfileForm({ profile, onSaved }: { profile: Profile | null | undefined
           </div>
 
           <Button type="submit" className="w-full" disabled={upsert.isPending || !level}>
-            {saved ? "✓ Sauvegardé" : upsert.isPending ? "Sauvegarde..." : "Sauvegarder"}
+            {upsert.isPending ? "Sauvegarde..." : "Sauvegarder"}
           </Button>
         </CardContent>
       </form>

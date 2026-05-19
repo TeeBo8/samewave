@@ -3,6 +3,7 @@ import { createTRPCRouter, protectedProcedure, publicProcedure } from "@/server/
 import { and, desc, eq } from "drizzle-orm"
 import { gameSession, sessionParticipant } from "@/server/db/schema"
 import { nanoid } from "nanoid"
+import { resend, FROM_EMAIL } from "@/lib/resend"
 
 export const sessionsRouter = createTRPCRouter({
   getAll: publicProcedure
@@ -81,6 +82,22 @@ export const sessionsRouter = createTRPCRouter({
         userId: ctx.user.id,
         status: "pending",
       })
+
+      const session = await ctx.db.query.gameSession.findFirst({
+        where: eq(gameSession.id, input.sessionId),
+        with: { creator: true },
+      })
+      if (session?.creator.email) {
+        resend.emails.send({
+          from: FROM_EMAIL,
+          to: session.creator.email,
+          subject: `${ctx.user.name} veut rejoindre ta session — ${session.spotName}`,
+          html: `<p>Salut ${session.creator.name} 👋</p>
+<p><strong>${ctx.user.name}</strong> veut rejoindre ta session <strong>${session.spotName}</strong>.</p>
+<p><a href="${process.env.BETTER_AUTH_URL}/session/${session.id}">Voir la demande →</a></p>`,
+        }).catch(() => null)
+      }
+
       return { id }
     }),
 
@@ -96,6 +113,22 @@ export const sessionsRouter = createTRPCRouter({
         .update(sessionParticipant)
         .set({ status: input.status, updatedAt: new Date() })
         .where(eq(sessionParticipant.id, input.participantId))
+
+      const participant = await ctx.db.query.sessionParticipant.findFirst({
+        where: eq(sessionParticipant.id, input.participantId),
+        with: { user: true, session: true },
+      })
+      if (participant?.user.email) {
+        const label = input.status === "accepted" ? "acceptée ✅" : "refusée ❌"
+        resend.emails.send({
+          from: FROM_EMAIL,
+          to: participant.user.email,
+          subject: `Ta demande a été ${label} — ${participant.session.spotName}`,
+          html: `<p>Salut ${participant.user.name} 👋</p>
+<p>Ta demande pour la session <strong>${participant.session.spotName}</strong> a été <strong>${label}</strong>.</p>
+<p><a href="${process.env.BETTER_AUTH_URL}/session/${participant.session.id}">Voir la session →</a></p>`,
+        }).catch(() => null)
+      }
     }),
 
   getMy: protectedProcedure.query(async ({ ctx }) => {
