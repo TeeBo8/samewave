@@ -7,6 +7,7 @@ import {
   timestamp,
   doublePrecision,
 } from "drizzle-orm/pg-core"
+import { relations } from "drizzle-orm"
 
 // ─── Enums ───────────────────────────────────────────────────────────────────
 
@@ -158,3 +159,40 @@ export const vibe = pgTable("vibe", {
   positive: boolean("positive").notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 })
+
+// ─── Relations (Drizzle relational query builder) ─────────────────────────────
+
+export const userRelations = relations(user, ({ one, many }) => ({
+  riderProfile: one(riderProfile, {
+    fields: [user.id],
+    references: [riderProfile.userId],
+  }),
+  gameSessions: many(gameSession),
+  participations: many(sessionParticipant),
+}))
+
+export const riderProfileRelations = relations(riderProfile, ({ one }) => ({
+  user: one(user, {
+    fields: [riderProfile.userId],
+    references: [user.id],
+  }),
+}))
+
+export const gameSessionRelations = relations(gameSession, ({ one, many }) => ({
+  creator: one(user, {
+    fields: [gameSession.creatorId],
+    references: [user.id],
+  }),
+  participants: many(sessionParticipant),
+}))
+
+export const sessionParticipantRelations = relations(sessionParticipant, ({ one }) => ({
+  session: one(gameSession, {
+    fields: [sessionParticipant.sessionId],
+    references: [gameSession.id],
+  }),
+  user: one(user, {
+    fields: [sessionParticipant.userId],
+    references: [user.id],
+  }),
+}))
