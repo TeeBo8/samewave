@@ -1,8 +1,8 @@
 "use client"
 
 import { useRouter } from "next/navigation"
-import Map, { Marker, NavigationControl } from "react-map-gl/mapbox"
-import "mapbox-gl/dist/mapbox-gl.css"
+import Map, { Marker, NavigationControl } from "react-map-gl/maplibre"
+import "maplibre-gl/dist/maplibre-gl.css"
 import type { RouterOutputs } from "@/trpc/types"
 
 type Session = RouterOutputs["sessions"]["getAll"][number]
@@ -16,22 +16,16 @@ const DISCIPLINE_EMOJI: Record<string, string> = {
   longboard: "🛴",
 }
 
+// OpenFreeMap — gratuit, sans token, tiles OpenStreetMap
+const MAP_STYLE = "https://tiles.openfreemap.org/styles/liberty"
+
 export function MapView({ sessions }: { sessions: Session[] }) {
   const router = useRouter()
-  const token = process.env.NEXT_PUBLIC_MAPBOX_TOKEN
 
   const sessionsWithCoords = sessions.filter(
     (s): s is Session & { lat: number; lng: number } =>
       s.lat !== null && s.lat !== undefined && s.lng !== null && s.lng !== undefined
   )
-
-  if (!token) {
-    return (
-      <div className="h-[420px] rounded-lg border bg-muted flex items-center justify-center">
-        <p className="text-sm text-muted-foreground">Token Mapbox manquant (NEXT_PUBLIC_MAPBOX_TOKEN)</p>
-      </div>
-    )
-  }
 
   if (sessionsWithCoords.length === 0) {
     return (
@@ -47,10 +41,9 @@ export function MapView({ sessions }: { sessions: Session[] }) {
   return (
     <div className="h-[420px] rounded-lg overflow-hidden border">
       <Map
-        mapboxAccessToken={token}
         initialViewState={{ longitude: avgLng, latitude: avgLat, zoom: 6 }}
         style={{ width: "100%", height: "100%" }}
-        mapStyle="mapbox://styles/mapbox/outdoors-v12"
+        mapStyle={MAP_STYLE}
       >
         <NavigationControl position="top-right" />
         {sessionsWithCoords.map((s) => (
