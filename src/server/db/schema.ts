@@ -21,7 +21,7 @@ export const disciplineEnum = pgEnum("discipline", [
 
 export const levelEnum = pgEnum("level", ["beginner", "intermediate", "advanced"])
 
-export const vibeEnum = pgEnum("vibe", ["chill", "progression", "competitive"])
+export const vibeEnum = pgEnum("vibe_rating", ["chill", "progression", "competitive"])
 
 export const sessionStatusEnum = pgEnum("session_status", [
   "open",
@@ -119,7 +119,7 @@ export const gameSession = pgTable("game_session", {
   lng: doublePrecision("lng"),
   scheduledAt: timestamp("scheduled_at").notNull(),
   level: levelEnum("level").notNull(),
-  vibe: vibeEnum("vibe").notNull(),
+  vibe: vibeEnum("vibe_rating").notNull(),
   maxRiders: integer("max_riders").notNull().default(4),
   description: text("description"),
   status: sessionStatusEnum("status").notNull().default("open"),
