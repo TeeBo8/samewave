@@ -36,10 +36,6 @@ export default function LoginPage() {
     router.push("/onboarding")
   }
 
-  async function handleGoogle() {
-    await authClient.signIn.social({ provider: "google", callbackURL: "/onboarding" })
-  }
-
   return (
     <Card className="w-full max-w-sm">
       <CardHeader>
@@ -74,17 +70,6 @@ export default function LoginPage() {
           </div>
           <Button type="submit" className="w-full" disabled={loading}>
             {loading ? "Connexion..." : "Se connecter"}
-          </Button>
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t" />
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-card px-2 text-muted-foreground">ou</span>
-            </div>
-          </div>
-          <Button type="button" variant="outline" className="w-full" onClick={handleGoogle}>
-            Continuer avec Google
           </Button>
         </CardContent>
       </form>
