@@ -48,11 +48,16 @@ export function SessionDetail({ sessionId }: { sessionId: string }) {
   const router = useRouter()
   const { data: session, isLoading, refetch } = trpc.sessions.getById.useQuery({ id: sessionId })
   const { data: me } = trpc.users.me.useQuery()
+  const { data: sentVibes, refetch: refetchVibes } = trpc.vibes.getSentForSession.useQuery(
+    { sessionId },
+    { enabled: !!me }
+  )
 
   const join = trpc.sessions.join.useMutation({ onSuccess: () => refetch() })
   const updateStatus = trpc.sessions.updateParticipantStatus.useMutation({
     onSuccess: () => refetch(),
   })
+  const sendVibe = trpc.vibes.send.useMutation({ onSuccess: () => refetchVibes() })
 
   if (isLoading) {
     return <div className="h-48 rounded-lg border bg-muted animate-pulse" />
@@ -67,6 +72,15 @@ export function SessionDetail({ sessionId }: { sessionId: string }) {
   const acceptedParticipants = session.participants.filter((p) => p.status === "accepted")
   const pendingParticipants = session.participants.filter((p) => p.status === "pending")
   const isFull = acceptedParticipants.length >= session.maxRiders - 1
+
+  const sessionIsPast = new Date(session.scheduledAt) < new Date()
+  const canSendVibes =
+    sessionIsPast &&
+    (myParticipation?.status === "accepted" || isCreator) &&
+    acceptedParticipants.length > 0
+
+  const vibeTargets = acceptedParticipants.filter((p) => p.userId !== me?.user.id)
+  const sentVibeTo = (userId: string) => sentVibes?.some((v) => v.toUserId === userId) ?? false
 
   return (
     <div className="space-y-5">
@@ -166,6 +180,34 @@ export function SessionDetail({ sessionId }: { sessionId: string }) {
             ))}
           </div>
         </div>
+      )}
+
+      {canSendVibes && vibeTargets.length > 0 && (
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base">🤙 Envoyer des vibes</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {vibeTargets.map((p) => {
+              const alreadySent = sentVibeTo(p.userId)
+              return (
+                <div key={p.id} className="flex items-center justify-between gap-2">
+                  <span className="text-sm">{p.user.name}</span>
+                  <Button
+                    size="sm"
+                    variant={alreadySent ? "secondary" : "outline"}
+                    disabled={alreadySent || sendVibe.isPending}
+                    onClick={() =>
+                      sendVibe.mutate({ sessionId, toUserId: p.userId })
+                    }
+                  >
+                    {alreadySent ? "✓ Vibe envoyée" : "🤙 Vibe"}
+                  </Button>
+                </div>
+              )
+            })}
+          </CardContent>
+        </Card>
       )}
 
       <Button variant="ghost" size="sm" onClick={() => router.back()} className="-ml-2">

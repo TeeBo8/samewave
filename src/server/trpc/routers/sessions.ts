@@ -97,4 +97,25 @@ export const sessionsRouter = createTRPCRouter({
         .set({ status: input.status, updatedAt: new Date() })
         .where(eq(sessionParticipant.id, input.participantId))
     }),
+
+  getMy: protectedProcedure.query(async ({ ctx }) => {
+    return ctx.db.query.gameSession.findMany({
+      where: eq(gameSession.creatorId, ctx.user.id),
+      orderBy: [desc(gameSession.scheduledAt)],
+      with: {
+        creator: true,
+        participants: { with: { user: true } },
+      },
+    })
+  }),
+
+  getMyParticipations: protectedProcedure.query(async ({ ctx }) => {
+    return ctx.db.query.sessionParticipant.findMany({
+      where: eq(sessionParticipant.userId, ctx.user.id),
+      orderBy: [desc(sessionParticipant.updatedAt)],
+      with: {
+        session: { with: { creator: true } },
+      },
+    })
+  }),
 })
