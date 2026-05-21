@@ -1,22 +1,8 @@
 "use client"
 
 import Link from "next/link"
-import { useTheme } from "next-themes"
-import { Moon, Sun } from "lucide-react"
 import { trpc } from "@/trpc/client"
-
-function ThemeToggle() {
-  const { resolvedTheme, setTheme } = useTheme()
-  return (
-    <button
-      onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
-      className="p-1 rounded-md hover:bg-accent transition-colors"
-      aria-label="Changer de thème"
-    >
-      {resolvedTheme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
-    </button>
-  )
-}
+import { ThemeToggle } from "@/components/theme-toggle"
 
 export function NavBar() {
   const { data } = trpc.users.getNotifications.useQuery(undefined, {

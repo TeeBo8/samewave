@@ -1,5 +1,6 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
+import { ThemeToggle } from "@/components/theme-toggle"
 
 const DISCIPLINES = [
   { emoji: "🏄", name: "Surf" },
@@ -37,6 +38,7 @@ export default function LandingPage() {
         <div className="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
           <span className="font-bold text-lg tracking-tight">SameWave</span>
           <div className="flex items-center gap-3">
+            <ThemeToggle />
             <Button variant="ghost" asChild>
               <Link href="/login">Connexion</Link>
             </Button>
