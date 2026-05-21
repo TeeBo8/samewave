@@ -164,12 +164,12 @@ export default function MyProfilePage() {
       )}
 
       <div className="pt-2">
-        <p className="text-xs text-muted-foreground">
+        <div className="text-xs text-muted-foreground flex items-center gap-1">
           Lien public :{" "}
           <Badge variant="outline" className="font-mono text-xs">
             /profile/{me?.user.id}
           </Badge>
-        </p>
+        </div>
       </div>
     </div>
   )

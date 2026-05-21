@@ -28,7 +28,7 @@ export function NavBar() {
   return (
     <nav className="sticky top-0 z-10 border-b bg-background/95 backdrop-blur">
       <div className="max-w-2xl mx-auto px-4 h-14 flex items-center justify-between">
-        <Link href="/feed" className="font-bold text-lg tracking-tight">
+        <Link href="/" className="font-bold text-lg tracking-tight">
           SameWave
         </Link>
         <div className="flex items-center gap-5 text-sm">
