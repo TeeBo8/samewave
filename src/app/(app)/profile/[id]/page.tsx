@@ -4,6 +4,7 @@ import { use } from "react"
 import { trpc } from "@/trpc/client"
 import { Badge } from "@/components/ui/badge"
 import { SessionCard } from "@/components/session-card"
+import { RiderAvatar } from "@/components/rider-avatar"
 
 const DISCIPLINE_EMOJI: Record<string, string> = {
   surf: "🏄",
@@ -40,7 +41,10 @@ export default function ProfilePage({ params }: Props) {
   return (
     <div className="space-y-6">
       <div className="space-y-2">
-        <h1 className="text-2xl font-bold">{profile.user.name}</h1>
+        <div className="flex items-center gap-4">
+          <RiderAvatar image={profile.user.image} name={profile.user.name} size="lg" />
+          <h1 className="text-2xl font-bold">{profile.user.name}</h1>
+        </div>
 
         <div className="flex flex-wrap gap-2">
           {profile.disciplines.map((d) => (

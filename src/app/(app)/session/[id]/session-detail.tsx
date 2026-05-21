@@ -1,5 +1,6 @@
 "use client"
 
+import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 import { trpc } from "@/trpc/client"
@@ -7,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
+import { RiderAvatar } from "@/components/rider-avatar"
 
 const DISCIPLINE_EMOJI: Record<string, string> = {
   surf: "🏄",
@@ -114,8 +116,19 @@ export function SessionDetail({ sessionId }: { sessionId: string }) {
 
       <Separator />
 
-      <div className="space-y-1">
-        <p className="text-sm font-medium">Organisé par {session.creator.name}</p>
+      <div className="space-y-2">
+        <div className="flex items-center gap-2">
+          <RiderAvatar image={session.creator.image} name={session.creator.name} size="sm" />
+          <div>
+            <p className="text-xs text-muted-foreground">Organisé par</p>
+            <Link
+              href={`/profile/${session.creator.id}`}
+              className="text-sm font-medium hover:underline"
+            >
+              {session.creator.name}
+            </Link>
+          </div>
+        </div>
         <p className="text-sm text-muted-foreground">
           {acceptedParticipants.length} / {session.maxRiders - 1} places prises
         </p>
@@ -180,14 +193,21 @@ export function SessionDetail({ sessionId }: { sessionId: string }) {
         </Card>
       )}
 
-      {isCreator && acceptedParticipants.length > 0 && (
+      {acceptedParticipants.length > 0 && (
         <div>
-          <p className="text-sm font-medium mb-2">Riders confirmés</p>
-          <div className="space-y-1">
+          <p className="text-sm font-medium mb-3">
+            Riders confirmés ({acceptedParticipants.length})
+          </p>
+          <div className="space-y-2">
             {acceptedParticipants.map((p) => (
-              <p key={p.id} className="text-sm text-muted-foreground">
-                {p.user.name}
-              </p>
+              <Link
+                key={p.id}
+                href={`/profile/${p.userId}`}
+                className="flex items-center gap-2 group"
+              >
+                <RiderAvatar image={p.user.image} name={p.user.name} size="sm" />
+                <span className="text-sm group-hover:underline">{p.user.name}</span>
+              </Link>
             ))}
           </div>
         </div>

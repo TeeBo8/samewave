@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { SessionCard } from "@/components/session-card"
+import { RiderAvatar } from "@/components/rider-avatar"
 import type { RouterOutputs } from "@/trpc/types"
 
 const DISCIPLINES = [
@@ -143,9 +144,12 @@ export default function MyProfilePage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold">{me?.user.name}</h1>
-        <p className="text-sm text-muted-foreground">{me?.user.email}</p>
+      <div className="flex items-center gap-4">
+        <RiderAvatar image={me?.user.image} name={me?.user.name ?? ""} size="lg" />
+        <div>
+          <h1 className="text-2xl font-bold">{me?.user.name}</h1>
+          <p className="text-sm text-muted-foreground">{me?.user.email}</p>
+        </div>
       </div>
 
       <ProfileForm profile={me?.profile} onSaved={() => refetch()} />
