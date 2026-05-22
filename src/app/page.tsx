@@ -1,3 +1,4 @@
+import Image from "next/image"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { ThemeToggle } from "@/components/theme-toggle"
@@ -52,16 +53,24 @@ export default function LandingPage() {
       <main className="flex-1">
 
         {/* Hero */}
-        <section className="py-28 px-6 text-center">
-          <div className="max-w-2xl mx-auto space-y-7">
-            <div className="inline-block border rounded-full px-4 py-1.5 text-xs font-medium text-muted-foreground mb-2">
+        <section className="relative flex items-center justify-center px-6 text-center overflow-hidden py-24">
+          <Image
+            src="/hero.jpg"
+            alt="Rider au spot"
+            fill
+            className="object-cover object-center"
+            priority
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/40 to-black/70" />
+          <div className="relative z-10 max-w-2xl mx-auto space-y-7">
+            <div className="inline-block border border-white/30 rounded-full px-4 py-1.5 text-xs font-medium text-white/70 mb-2">
               Surf · Skate · Snow · Wake · Kite
             </div>
-            <h1 className="text-5xl sm:text-6xl font-extrabold tracking-tight leading-tight">
+            <h1 className="text-5xl sm:text-6xl font-extrabold tracking-tight leading-tight text-white">
               Les vraies rencontres<br />
-              <span className="text-muted-foreground">se passent au spot.</span>
+              <span className="text-white/60">se passent au spot.</span>
             </h1>
-            <p className="text-lg text-muted-foreground leading-relaxed">
+            <p className="text-lg text-white/70 leading-relaxed">
               SameWave connecte les riders par les sessions IRL.
               Pas de swipe, pas de match dans le vide —
               juste des gens qui vivent vraiment comme toi.
@@ -70,23 +79,19 @@ export default function LandingPage() {
               <Button size="lg" asChild>
                 <Link href="/register">Créer mon compte</Link>
               </Button>
-              <Button size="lg" variant="outline" asChild>
+              <Button size="lg" variant="outline" className="border-white text-white bg-white/10 hover:bg-white/20 hover:text-white" asChild>
                 <Link href="/feed">Voir les sessions</Link>
               </Button>
             </div>
-            <p className="text-xs text-muted-foreground pt-2">
+            <p className="text-xs text-white/50 pt-2">
               Gratuit · Pas de paywall · Pas de dark patterns
             </p>
-          </div>
-        </section>
-
-        {/* Insight */}
-        <section className="py-16 px-6 bg-muted/40">
-          <div className="max-w-2xl mx-auto text-center space-y-4">
-            <p className="text-2xl font-semibold leading-snug">
-              &ldquo;Deux personnes qui partagent une session ont déjà plus en commun qu&apos;un couple qui a matché sur une app.&rdquo;
-            </p>
-            <p className="text-sm text-muted-foreground">— SameWave</p>
+            <div className="pt-8 border-t border-white/15">
+              <p className="text-xl sm:text-2xl font-semibold text-white/80 leading-snug italic">
+                &ldquo;Deux personnes qui partagent une session ont déjà plus<br className="hidden sm:block" /> en commun qu&apos;un couple qui a matché sur une app.&rdquo;
+              </p>
+              <p className="text-sm text-white/40 mt-3">— SameWave</p>
+            </div>
           </div>
         </section>
 
