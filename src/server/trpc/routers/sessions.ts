@@ -4,6 +4,7 @@ import { and, desc, eq } from "drizzle-orm"
 import { gameSession, sessionParticipant } from "@/server/db/schema"
 import { nanoid } from "nanoid"
 import { resend, FROM_EMAIL } from "@/lib/resend"
+import { TRPCError } from "@trpc/server"
 
 export const sessionsRouter = createTRPCRouter({
   getAll: publicProcedure
@@ -67,6 +68,15 @@ export const sessionsRouter = createTRPCRouter({
   join: protectedProcedure
     .input(z.object({ sessionId: z.string() }))
     .mutation(async ({ ctx, input }) => {
+      const session = await ctx.db.query.gameSession.findFirst({
+        where: eq(gameSession.id, input.sessionId),
+        with: { creator: true },
+      })
+      if (!session) throw new TRPCError({ code: "NOT_FOUND" })
+      if (session.creatorId === ctx.user.id) {
+        throw new TRPCError({ code: "FORBIDDEN", message: "Tu ne peux pas rejoindre ta propre session" })
+      }
+
       const existing = await ctx.db.query.sessionParticipant.findFirst({
         where: and(
           eq(sessionParticipant.sessionId, input.sessionId),
@@ -83,11 +93,7 @@ export const sessionsRouter = createTRPCRouter({
         status: "pending",
       })
 
-      const session = await ctx.db.query.gameSession.findFirst({
-        where: eq(gameSession.id, input.sessionId),
-        with: { creator: true },
-      })
-      if (session?.creator.email) {
+      if (session.creator.email) {
         resend.emails.send({
           from: FROM_EMAIL,
           to: session.creator.email,
@@ -109,16 +115,21 @@ export const sessionsRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ ctx, input }) => {
+      const participant = await ctx.db.query.sessionParticipant.findFirst({
+        where: eq(sessionParticipant.id, input.participantId),
+        with: { user: true, session: true },
+      })
+      if (!participant) throw new TRPCError({ code: "NOT_FOUND" })
+      if (participant.session.creatorId !== ctx.user.id) {
+        throw new TRPCError({ code: "FORBIDDEN" })
+      }
+
       await ctx.db
         .update(sessionParticipant)
         .set({ status: input.status, updatedAt: new Date() })
         .where(eq(sessionParticipant.id, input.participantId))
 
-      const participant = await ctx.db.query.sessionParticipant.findFirst({
-        where: eq(sessionParticipant.id, input.participantId),
-        with: { user: true, session: true },
-      })
-      if (participant?.user.email) {
+      if (participant.user.email) {
         const label = input.status === "accepted" ? "acceptée ✅" : "refusée ❌"
         resend.emails.send({
           from: FROM_EMAIL,

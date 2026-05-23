@@ -3,11 +3,16 @@ import { createTRPCRouter, protectedProcedure, publicProcedure } from "@/server/
 import { and, count, eq } from "drizzle-orm"
 import { vibe } from "@/server/db/schema"
 import { nanoid } from "nanoid"
+import { TRPCError } from "@trpc/server"
 
 export const vibesRouter = createTRPCRouter({
   send: protectedProcedure
     .input(z.object({ sessionId: z.string(), toUserId: z.string() }))
     .mutation(async ({ ctx, input }) => {
+      if (input.toUserId === ctx.user.id) {
+        throw new TRPCError({ code: "BAD_REQUEST", message: "Tu ne peux pas t'envoyer un vibe à toi-même" })
+      }
+
       const existing = await ctx.db.query.vibe.findFirst({
         where: and(
           eq(vibe.sessionId, input.sessionId),
