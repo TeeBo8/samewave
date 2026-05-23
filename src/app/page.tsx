@@ -179,7 +179,17 @@ export default function LandingPage() {
       <footer className="border-t py-6 px-6">
         <div className="max-w-5xl mx-auto flex items-center justify-between text-xs text-muted-foreground">
           <span>© 2026 SameWave</span>
-          <span>Fait avec 🤙 pour les riders</span>
+          <span>
+            Fait avec 🤙 pour les riders · Crafted by{" "}
+            <a
+              href="https://www.teebostudio.fr/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline underline-offset-2 hover:text-foreground transition-colors"
+            >
+              TeeboStudio
+            </a>
+          </span>
         </div>
       </footer>
 
