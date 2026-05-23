@@ -1,36 +1,133 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# SameWave 🌊
 
-## Getting Started
+**Find riders for your next session — surf, skate, snow, wake, kite.**
 
-First, run the development server:
+SameWave connects riders who want to session together IRL. No matching algorithms, no DMs required. Just open sessions, join requests, and vibes.
+
+🔗 **[samewave-silk.vercel.app](https://samewave-silk.vercel.app)**
+
+---
+
+## The problem
+
+You show up at the spot alone. Your usual crew isn't around. The Facebook group has 3000 members but nobody answers. You session alone anyway.
+
+SameWave fixes that. Riders post sessions. Other riders join. Simple.
+
+---
+
+## Features
+
+- **Session feed** — Browse open sessions nearby, filter by discipline
+- **Map view** — See sessions on a map (MapLibre, zero API token needed)
+- **Join requests** — Request to join a session, creator accepts or rejects
+- **Rider profiles** — Level, disciplines, favorite spots, bio
+- **Vibes** — Post-session positive feedback between riders
+- **Email notifications** — Join requests & status updates via Resend
+- **Dark / light mode** — Because riders have taste
+- **Mobile-first** — Built for the beach, the park, the mountain
+
+---
+
+## Stack
+
+| Layer | Tech |
+|-------|------|
+| Framework | Next.js 16 (App Router, Turbopack) |
+| Language | TypeScript (strict) |
+| UI | shadcn/ui + Tailwind CSS v4 |
+| API | tRPC v11 |
+| Database | Neon (PostgreSQL) |
+| ORM | Drizzle ORM |
+| Auth | Better Auth |
+| Maps | MapLibre GL + react-map-gl |
+| Emails | Resend |
+| Deployment | Vercel |
+| Tests | Vitest (14 tests, security-focused) |
+
+---
+
+## Getting started
+
+### Prerequisites
+
+- Node.js 20+
+- pnpm
+- A [Neon](https://neon.tech) database
+- A [Resend](https://resend.com) API key
+
+### Setup
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/TeeBo8/samewave.git
+cd samewave
+pnpm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Copy the environment file and fill in your values:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+cp .env.example .env.local
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```env
+DATABASE_URL=
+DATABASE_URL_UNPOOLED=
+BETTER_AUTH_SECRET=
+BETTER_AUTH_URL=http://localhost:3000
+RESEND_API_KEY=
+```
 
-## Learn More
+Push the database schema:
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+pnpm db:push
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Start the dev server:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+pnpm dev
+```
 
-## Deploy on Vercel
+Open [http://localhost:3000](http://localhost:3000).
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Tests
+
+```bash
+pnpm test        # run once
+pnpm test:watch  # watch mode
+```
+
+14 tests covering auth middleware, session join/accept security, and vibe constraints.
+
+---
+
+## Disciplines
+
+Surf · Skate · Snowboard · Wake · Kite · Longboard
+
+---
+
+## Roadmap
+
+- [ ] Google OAuth
+- [ ] Photo upload (session / avatar)
+- [ ] Direct messaging between riders
+- [ ] Vibe leaderboard
+- [ ] PWA / push notifications
+- [ ] Map clustering for dense spots
+
+---
+
+## Contributing
+
+This project is early-stage and feedback-driven. If you ride and have opinions about what's missing — open an issue or drop a message.
+
+---
+
+## License
+
+MIT
